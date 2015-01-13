@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>KWB Garageverkoop 2015</title>
+        <meta name="viewport" content="initial-scale=1, maximum-scale=1"/>
+	    <script type="text/javascript" src="http://soma.smaato.net/oapi/js/smaatoAdTag.js"></script>
+		<script type="text/javascript" src="js/smaato.js"></script>
+        <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=true"></script>
+        <script type="text/javascript" src="js/markerclusterer_packed.js"></script>
+        <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.4/jquery.mobile-1.4.4.min.css">
+		<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+		<script src="http://code.jquery.com/mobile/1.4.4/jquery.mobile-1.4.4.min.js"></script>
+	    <script type="text/javascript" src="http://jeroen.890m.com/js/list.js"></script>
+		<script type="text/javascript" src="js/showlist.js"></script>
+
+
+     <style>
+    	#map-canvas {
+    		padding: 0;
+		    position : absolute !important; 
+		    top : 0px !important;  
+		    right : 0; 
+		    bottom : 0px !important;  
+		    left : 0 !important;     
+		}
+        #header {
+            height:54px;
+        }
+        #bars-button {
+            margin:7px;
+        }
+        #bars-title {
+            margin:7px;
+        }        
+         #footer {
+            height:35px !important; 
+        }       
+        @media screen and (min-device-width: 768px) {
+			#footer {
+            	height:49px !important; 
+        }}
+
+    </style>
+        <script>
+    var infowindow = null;
+    
+    	$(document).on('pageshow', '#map-page',function(e,data){   
+ 
+   // This is the minimum zoom level that we'll allow
+   var minZoomLevel = 12;
+
+   var map = new google.maps.Map(document.getElementById('map-canvas'), {
+      zoom: minZoomLevel,
+      center: new google.maps.LatLng(51.0974612, 3.8378242),
+      mapTypeId: google.maps.MapTypeId.ROADMAP
+   });
+
+/*   var strictBounds = new google.maps.LatLngBounds(
+     new google.maps.LatLng(50.9, 3.8), 
+     new google.maps.LatLng(51.1, 3.9)
+   );
+
+   google.maps.event.addListener(map, 'dragend', function() {
+     if (strictBounds.contains(map.getCenter())) return;
+
+     var c = map.getCenter(),
+         x = c.lng(),
+         y = c.lat(),
+         maxX = strictBounds.getNorthEast().lng(),
+         maxY = strictBounds.getNorthEast().lat(),
+         minX = strictBounds.getSouthWest().lng(),
+         minY = strictBounds.getSouthWest().lat();
+
+     if (x < minX) x = minX;
+     if (x > maxX) x = maxX;
+     if (y < minY) y = minY;
+     if (y > maxY) y = maxY;
+
+     map.setCenter(new google.maps.LatLng(y, x));
+   });
+*/
+   google.maps.event.addListener(map, 'zoom_changed', function() {
+     if (map.getZoom() < minZoomLevel) map.setZoom(minZoomLevel);
+   });  
+ 
+  setMarkers(map, points);
+
+});
+
+function setMarkers(map, locations) {
+	var image = {
+		url: 'img/home.png',
+		size: new google.maps.Size(32, 37),
+		origin: new google.maps.Point(0,0),
+		anchor: new google.maps.Point(0, 37)
+		};
+
+	var shape = {
+		coords: [1,1, 1,20, 18,20, 18,1],
+		type: 'poly'
+		};
+
+	var markers = [];
+	
+	var styles = [{
+    url: 'img/empty1.png',
+	height: 37,
+    width: 32,
+
+    textColor: '#ffffff',
+    opt_textSize: 10
+}, {
+    url: 'img/empty2.png',
+        height: 37,
+        width: 32,
+        opt_anchor: [6, 0],
+        textColor: '#ffffff',
+        opt_textSize: 11
+}, {
+    url: 'img/empty3.png',
+        width: 32,
+        height: 37,
+        opt_anchor: [8, 0],
+        opt_textSize: 12
+}];
+
+
+  for (var i = 0; i < locations.length; i++) {
+    var point = locations[i];
+    var myLatLng = new google.maps.LatLng(point[1], point[2]);
+    var marker = new google.maps.Marker({
+		position: myLatLng,
+		map: map,
+		icon: image,
+			//shape: shape,
+		title: point[0],
+		zIndex: point[3],
+		html: '<div style="line-height:1.35;overflow:hidden;white-space:nowrap;width: 300px;"><b>'+point[0] + '</b><br/>' + point[4]+'</div>'
+    });
+    markers.push(marker);
+    google.maps.event.addListener(marker, "click", function() {
+	infowindow.setContent(this.html);
+	infowindow.open(map,this);
+	});
+  }
+  
+  	var infoimage = {
+		url: 'img/info.png',
+		size: new google.maps.Size(32, 37),
+		origin: new google.maps.Point(0,0),
+		anchor: new google.maps.Point(0, 37)
+		};
+	
+	infowindow = new google.maps.InfoWindow({
+        content: "loading..."
+        });
+	
+	var infoshape = {
+		coords: [1,1, 1,20, 18,20, 18,1],
+		type: 'poly'
+		};
+	
+	var infomarker = new google.maps.Marker({
+		position: new google.maps.LatLng(51.096548, 3.833586),
+		map: map,
+		icon: infoimage,
+			//shape: shape,
+		title: "Infopunt KWB Lochristi",
+		zIndex: 999,
+		html: '<div style="line-height:1.35;overflow:hidden;white-space:nowrap;width: 300px;height: 50px;"><b>'+ "Infopunt KWB Lochristi" + '</b><br/>' + "Bij eventuele vragen kan u hier steeds<br />langskomen bij ons infopunt." +'</div>'
+		});
+    google.maps.event.addListener(infomarker, "click", function() {
+	infowindow.setContent(this.html);
+	infowindow.open(map,this);
+	});
+
+	if(navigator.geolocation) {
+		var curlocimage = {
+			url: 'img/bluedot.png',
+			size: new google.maps.Size(38, 38),
+			origin: new google.maps.Point(0,0),
+			anchor: new google.maps.Point(0, 38)
+			};
+
+		infowindow = new google.maps.InfoWindow({
+			content: "loading..."
+			});
+	
+		var shape = {
+			coords: [1,1, 1,20, 18,20, 18,1],
+			type: 'poly'
+			};
+
+		navigator.geolocation.getCurrentPosition(function(position) {
+		var pos = new google.maps.LatLng(position.coords.latitude,
+										 position.coords.longitude);
+
+		var marker = new google.maps.Marker({
+		position: pos,
+		map: map,
+		icon: curlocimage
+		});
+		markers.push(marker);
+		bounds.extend(marker.position);
+		}, function() {});
+	}
+
+
+  	var mcOptions = {gridSize: 40, maxZoom: 16, styles: styles};
+	var mc = new MarkerClusterer(map, markers, mcOptions);
+
+}
+
+
+    </script> 
+
+    </head>
+    <body>
+        <div data-role="page" id="home" data-theme="a">
+	        <div data-role="panel" id="navpanel" data-theme="a" data-position-fixed="true" data-display="push" data-position="right">
+	    		<h2 id="bars-title"><center><img src="img/KWB-logo.png" width="100%"></center></h2>
+    	    	<div data-role="controlgroup" data-corners="false">
+	    	        <a href="#home" data-role="button" data-theme="a">Garageverkoop</a>
+    	    	    <a href="#map-page" data-role="button" data-theme="a">Kaart</a>
+        	    	<a href="#lijst" data-role="button" data-theme="a">Lijst</a>
+	            	<a href="#over" data-role="button" data-theme="a">Over</a>
+		        </div>   
+    		</div>
+	    	<div id="header" data-role="header" data-position="fixed" data-theme="a">
+   				<h1 id="bars-title">Garageverkoop</h1>
+	    	    <a id="bars-button" href="#navpanel" data-role="button" data-icon="bars" data-iconshadow="false"
+    	    	data-direction="reverse" data-transition="slide"
+	        	data-iconpos="notext"  class="ui-btn-right">home</a>
+		    </div>
+
+    		<div data-role="content">
+
+				<p>Liggen er bij jou op zolder of berging ook een pak mooie, bruikbare dingen die je eigenlijk niet meer nodig hebt, maar die te goed zijn om weg te gooien of te geven.
+				<br />Wat moet je er nog mee doen?</p>
+				<p><b>KWB Lochristi heeft de oplossing:</b></p>
+				<p>Op zondag 5 mei organiseren we , tussen 09.00u en 17.00u , in klein Lochristi een garageverkoop. Een soort rommelmarkt waarbij je de kans krijgt om in uw garage of op oprit die spullen te verkopen die je niet langer nodig hebt.<br />
+				   Wij zorgen voor promotiemateriaal , bekendmaking , parcours , enz.<br />
+				   Wel vragen we een kleine bijdrage aan u : 4 &euro; voor KWB leden en 8 &euro; voor niet-leden.</p>
+				<p>Heb je interesse , neem dan , voor 21 april , contact op met : <b>VERHOFSTE EDDY</b></p>	
+			</div>
+			<div id="footer" data-role="footer" data-position="fixed" data-theme="a">&nbsp;</div>
+		</div>
+            
+            
+        <div data-role="page" id="map-page" data-url="map-page">
+    		<div data-role="panel" id="navpanel2" data-theme="a" data-position-fixed="true" data-display="push" data-position="right">
+    			<h2 id="bars-title"><center><img src="img/KWB-logo.png" width="100%"></center></h2>
+        		<div data-role="controlgroup" data-corners="false">
+            		<a href="#home" data-role="button" data-theme="a">Garageverkoop</a>
+            		<a href="#map-page" data-role="button" data-theme="a">Kaart</a>
+            		<a href="#lijst" data-role="button" data-theme="a">Lijst</a>
+            		<a href="#over" data-role="button" data-theme="a">Over</a>
+        		</div>   
+    		</div>
+	    	<div id="header" data-role="header" data-position="fixed" data-theme="a">
+   				<h1 id="bars-title">Kaart</h1>
+	        	<a id="bars-button" href="#navpanel2" data-role="button" data-icon="bars" data-iconshadow="false"
+		        data-direction="reverse" data-transition="slide"
+    		    data-iconpos="notext"  class="ui-btn-right">home</a>
+	    	</div>
+		    <div data-role="content" id="map-canvas"> <!--Div for map display.-->
+   			</div>
+			<div id="footer" data-role="footer" data-position="fixed" data-theme="a">
+				<div id="smaatoadkaart" style="padding: 0px;z-index: 4"></div>
+			</div>
+		</div>
+
+		<div data-role="page" id="lijst" data-theme="a">
+			<div data-role="panel" id="navpanel3" data-theme="a" data-display="overlay" data-position="right">
+    			<h2 id="bars-title"><center><img src="img/KWB-logo.png" width="100%"></center></h2>
+        		<div data-role="controlgroup" data-corners="false">
+		            <a href="#home" data-role="button" data-theme="a">Garageverkoop</a>
+        		    <a href="#map-page" data-role="button" data-theme="a">Kaart</a>
+		            <a href="#lijst" data-role="button" data-theme="a">Lijst</a>
+        		    <a href="#over" data-role="button" data-theme="a">Over</a>
+		        </div>   
+		    </div>
+		    <div id="header" data-role="header" data-position="fixed" data-theme="a">
+		   		<h1 id="bars-title">Lijst</h1>
+		    	<a id="bars-button" href="#navpanel3" data-role="button" data-icon="bars" data-iconshadow="false"
+		        data-direction="reverse" data-transition="slide"
+		        data-iconpos="notext"  class="ui-btn-right">home</a>
+		    </div>      
+		    <div data-role="content">
+		        <div class="example-wrapper" data-iscroll>
+		            <ul data-role="listview" data-inset="true" data-icon="false" id="movie-list" data-theme="a" data-autodividers="true" class="addressList2"></ul>
+		        </div>
+    		</div> 
+    		<div id="footer" data-role="footer" data-position="fixed" data-theme="a">
+		    	<div id="smaatoadlijst" style="padding: 0px">
+		    	</div>
+			</div>  
+		    <div data-dismissible="false" data-role="popup" id="myPopup"  class="ui-content" data-overlay-theme="a" data-theme="a"><!--style="max-width:800px"-->
+				<a href="#" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-left">Close</a>
+				<div role="main" class="ui-content" id="popup-content">
+				    <h3 id="popup-title" align="center">&nbsp;</h3>
+				  	<p id="popup-address" align="center">&nbsp;</p>
+				   	<p id="popup-image" align="center">&nbsp;</p>
+				</div>
+			</div>
+		</div>
+
+		<div data-role="page" id="over" data-theme="a">
+			<div data-role="panel" id="navpanel4" data-theme="a" data-display="overlay" data-position="right">
+    			<h2 id="bars-title"><center><img src="img/KWB-logo.png" width="100%"></center></h2>
+        		<div data-role="controlgroup" data-corners="false">
+            		<a href="#home" data-role="button" data-theme="a">Garageverkoop</a>
+            		<a href="#map-page" data-role="button" data-theme="a">Kaart</a>
+            		<a href="#lijst" data-role="button" data-theme="a">Lijst</a>
+            		<a href="#over" data-role="button" data-theme="a">Over</a>
+        		</div>   
+    		</div>
+    		<div id="header" data-role="header" data-position="fixed" data-theme="a">
+   				<h1 id="bars-title">Over</h1>
+    			<a id="bars-button" href="#navpanel4" data-role="button" data-icon="bars" data-iconshadow="false"
+        		data-direction="reverse" data-transition="slide"
+        		data-iconpos="notext"  class="ui-btn-right">home</a>
+    		</div>
+			<div data-role="content">
+				<p><b>Verantwoordelijke Garageverkoop KWB Lochristi:</b> VERHOFST&Eacute; Eddy</p>
+				<p><b>Voorzitter KWB Lochristi:</b> VAN DAELE Geert</p>
+				<p><b>Ontwerp APP / mobiele site:</b> VAN HOORDE Jeroen</p>
+			</div>
+			<div id="footer" data-role="footer" data-position="fixed" data-theme="a">
+		    	<div id="smaatoadover" style="padding: 0px">
+		    	</div>
+			</div>
+		</div>
+	</body>
+</html>    
